@@ -1,7 +1,5 @@
 
-# FemMicro16S
-## Advancing the science of women’s health through open data sharing
-<img width="300" alt="FemMicro_logo" src="https://github.com/SycuroLab/FemMicro16S/assets/54686930/955597f7-8a13-485f-b4d9-aa17c02dddf8">
+# DADAcore16S
 
 [![Conda](https://img.shields.io/badge/conda-v22.11.1-lightgrey)](https://docs.conda.io/en/latest/)
 [![Snakemake](https://img.shields.io/badge/snakemake-7.32.4-blue)](https://snakemake.bitbucket.io)
