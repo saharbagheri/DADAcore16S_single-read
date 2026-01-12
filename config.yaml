@@ -46,7 +46,8 @@ primer_investigation: False #True or False
 primers:
 fwd_primer: ""
 rev_primer: ""
-
+fwd_primer_rc: ""
+rev_primer_rc: ""
 
 ## Primer detection parameters
 # minimum overlap length for primer removal
