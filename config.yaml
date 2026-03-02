@@ -39,8 +39,8 @@ taxonomy_threads: 20  #Specific rule
 ## Removing primers if they were sequenced. 
 ##***If primers need to be removed set this to True and add the primer sequences***
 
-primer_removal: False  #True or False
-primer_investigation: False #True or False
+primer_removal: True  #True or False
+primer_investigation: True #True or False
 
 #Reverse complement flag is added to the cutadapt code.
 primers:
