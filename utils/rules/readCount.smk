@@ -3,7 +3,7 @@ rule rawReadCount:
         list_files["R1"].iloc[1].rsplit("/", 1)[0]
     output:
         config["output_dir"]+"/dada2/rawReadCount.txt"
-    conda: "QC"
+    singularity: "apptainer/qc-1.0.0.sif"
     params:
         format=config["compression_suffix"]
     shell:
