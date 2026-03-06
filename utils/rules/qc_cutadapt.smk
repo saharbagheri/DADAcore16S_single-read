@@ -75,7 +75,7 @@ rule primerRMVinvestigation:
         primer_status_bf=config["output_dir"]+"/primer_status/primer_existance_raw.csv",
         primer_status_af=config["output_dir"]+"/primer_status/primer_existance_trimmed.csv"
     singularity:
-        "dada2_new"
+        "apptainer/dada2-1.0.0.sif"
     script:
         "../scripts/dada2/primer_investigation.R"
 
