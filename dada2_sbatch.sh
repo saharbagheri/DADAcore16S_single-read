@@ -19,7 +19,21 @@ conda activate snakemake
 
 snakemake --unlock
 
-snakemake --rerun-triggers mtime --latency-wait 60 --rerun-incomplete  --cluster-config cluster.json --cluster 'sbatch --partition={cluster.partition} --cpus-per-task={cluster.cpus-per-task} --nodes={cluster.nodes} --ntasks={cluster.ntasks} --time={cluster.time} --mem={cluster.mem} --output={cluster.output} --error={cluster.error}' --jobs $num_jobs --use-conda &>> $log_dir/$log_file
+
+#Preparing apptainer envs
+
+mkdir -p apptainer
+
+apptainer pull apptainer/qc-1.0.0.sif library://saharbagheri/femmicro16s/qc:1.0.0
+
+apptainer pull apptainer/dada2-1.0.0.sif library://saharbagheri/femmicro16s/dada2:1.0.0
+
+apptainer pull apptainer/rmd-1.0.0.sif library://saharbagheri/femmicro16s/rmd:1.0.0
+
+apptainer pull apptainer/vsearch-1.0.0.sif library://saharbagheri/femmicro16s/vsearch:1.0.0
+
+
+snakemake --singularity-args "-B /bulk" --rerun-triggers mtime --latency-wait 60 --rerun-incomplete  --cluster-config cluster.json --cluster 'sbatch --partition={cluster.partition} --cpus-per-task={cluster.cpus-per-task} --nodes={cluster.nodes} --ntasks={cluster.ntasks} --time={cluster.time} --mem={cluster.mem} --output={cluster.output} --error={cluster.error}' --jobs $num_jobs --use-singularity &>> $log_dir/$log_file
 
 bash Version_check.sh > used_tools_versions.txt
 bash check_jobs.sh 
