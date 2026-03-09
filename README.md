@@ -51,8 +51,6 @@ Certain rules are executed only when their corresponding parameters are set to T
 
 The **filterNsRaw** and **primerRMVinvestigation** rules are used to examine primers in reads both before and after removal and are triggered if the **primer_removal** parameter is set to True.
 
-The **read_subsampling** rule is performed when the **subsample** parameter is set to True, allowing error rates to be learned from a larger set of samples.
-
 Lastly, the **vsearchURE** rule is executed if the **URE_after_GTDB** parameter is set to True, enabling the use of the URE database to annotate ASVs that could not be assigned using GTDB.
 
 <br>
