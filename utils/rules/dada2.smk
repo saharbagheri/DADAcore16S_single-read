@@ -62,39 +62,6 @@ rule plotQualityProfileAfterdada2:
 
 
 
-rule read_subsampling:
-    input:
-        R1=rules.dada2Filter.output.R1,
-        R2=rules.dada2Filter.output.R2
-    output:
-        R1_subsampled=expand(config["output_dir"]+"/subsampled/{sample}"+ config["forward_read_suffix"]+"_subsampled"+ config["compression_suffix"], sample=SAMPLES),
-        R2_subsampled=expand(config["output_dir"]+"/subsampled/{sample}"+ config["reverse_read_suffix"]+"_subsampled"+ config["compression_suffix"], sample=SAMPLES)
-    params:
-        percent=config["subsample2LearnErrorRate"],
-        output_dir=config["output_dir"]+"/subsampled",
-        output_suff_r1=config["forward_read_suffix"]+"_subsampled"+ config["compression_suffix"],
-        output_suff_r2=config["reverse_read_suffix"]+"_subsampled"+ config["compression_suffix"]
-    singularity:
-        "apptainer/dada2-1.0.0.sif"
-    shell:
-        """
-        if [[ "{config[subsample]}" == "True" ]]; then
-            mkdir -p {params.output_dir}
-            for SAMPLE in {SAMPLES}; do
-                R1="{config[output_dir]}/dada2/dada2_filter/${{SAMPLE}}{config[forward_read_suffix]}{config[compression_suffix]}"
-                R2="{config[output_dir]}/dada2/dada2_filter/${{SAMPLE}}{config[reverse_read_suffix]}{config[compression_suffix]}"
-                outfile_R1="{params.output_dir}/${{SAMPLE}}{params.output_suff_r1}"
-                outfile_R2="{params.output_dir}/${{SAMPLE}}{params.output_suff_r2}"
-                seqtk sample -s100 $R1 {params.percent} > $outfile_R1
-                seqtk sample -s100 $R2 {params.percent} > $outfile_R2
-            done
-        else
-            echo "Rule 'read_subsampling' is not executed because 'subsampling' is set to 'false' in the config file."
-        fi
-        """
-
-
-
 rule learnErrorRates:
     input:
         R1= rules.read_subsampling.output.R1_subsampled if config.get("subsample", True) else rules.dada2Filter.output.R1,
