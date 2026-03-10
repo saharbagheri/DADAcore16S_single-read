@@ -11,7 +11,7 @@ data using dada2. DADA2 tutorial can be found from https://benjjneb.github.io/da
 
 <br>
 
-In this pipeline, species assignment is accomplished through the application of two methods:
+In this pipeline, species-level taxonomy assignment is performed using two complementary methods: DADA2 and VSEARCH and incorporates annotations from different databases: GTDB, Silva, RDP, and a field-specific database (example here: URE).
 
 1- DADA2: a naive Bayesian classifier method (https://pubmed.ncbi.nlm.nih.gov/17586664/), where a strict requirement of a 100% nucleotide identity match between the reference sequences and the query is employed. Four different databases were used for taxonomy assignmnet. However, for final assignmnet, GTDB assignment was used and where GTDB was unable to provide an annotation for an ASV, we utilized the corresponding annotation from the URE database.
 
@@ -21,6 +21,7 @@ For a more comprehensive understanding of this methodology, please refer to the 
 
 Finally for combining the annotation results from Vsearch and DADA2, we prioritized annotations from VSEARCH over those from the DADA2 RDP classification. This approach ensures a comprehensive and accurate taxonomy assignment by leveraging the strengths of multiple databases and methodologies.
 
+As a summary, taxonomy is assigned using a hierarchical strategy prioritizing VSEARCH-GTDB, followed by VSEARCH with a field-specific database, then DADA2-GTDB, and finally DADA2 with the field-specific database. Species-level gaps in VSEARCH assignments (NA assigned by VSEARCH) are supplemented using DADA2 classifications.
 <br>
 
 ## Overview
