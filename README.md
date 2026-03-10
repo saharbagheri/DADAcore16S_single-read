@@ -12,11 +12,11 @@ This is a snakemake workflow for profiling microbial communities from amplicon s
 
 In this pipeline, species-level taxonomy assignment is performed using two complementary methods: DADA2 and VSEARCH and incorporates annotations from different databases: GTDB, Silva, RDP, and a field-specific database (example here: URE). We offer the option to incorporate a field-specific database into the pipeline (e.g., host- or environment-specific reference sets). When enabled, this database is prioritized after GTDB in both the VSEARCH and DADA2 workflows.
 
-1- DADA2: a naive Bayesian classifier method (https://pubmed.ncbi.nlm.nih.gov/17586664/), where a strict requirement of a 100% nucleotide identity match between the reference sequences and the query is employed. Four different databases were used for taxonomy assignmnet. However, for final assignmnet, GTDB assignment was used and where GTDB was unable to provide an annotation for an ASV, we utilized the corresponding annotation from the URE database.
+1- DADA2: a naive Bayesian classifier method (https://pubmed.ncbi.nlm.nih.gov/17586664/), where a strict requirement of a 100% nucleotide identity match between the reference sequences and the query is employed. Four different databases were used for taxonomy assignmnet. However, for final assignmnet, GTDB assignment was used and where GTDB was unable to provide an annotation for an ASV, we utilized the corresponding annotation from the field-specific (e.g. URE) database.
 
 2- VSEARCH: a global sequence alignment method with adjustable identity threshold between query and potential target sequences.
 VSEARCH, an open-source alternative to the widely utilized USEARCH tool, is employed in this context. VSEARCH excels in performing optimal global sequence alignments for the query against potential target sequences.
-For a more comprehensive understanding of this methodology, please refer to the paper available at https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5075697/ and the manual at https://github.com/torognes/vsearch/releases/download/v2.27.0/vsearch_manual.pdf. GTDB database was used for final taxonomy assignmnet and where GTDB was unable to provide an annotation for an ASV, we utilized the corresponding annotation from the URE database.
+For a more comprehensive understanding of this methodology, please refer to the paper available at https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5075697/ and the manual at https://github.com/torognes/vsearch/releases/download/v2.27.0/vsearch_manual.pdf. GTDB database was used for final taxonomy assignmnet and where GTDB was unable to provide an annotation for an ASV, we utilized the corresponding annotation from the field-specific (e.g. URE) database.
 
 Finally for combining the annotation results from Vsearch and DADA2, we prioritized annotations from VSEARCH over those from the DADA2 RDP classification. This approach ensures a comprehensive and accurate taxonomy assignment by leveraging the strengths of multiple databases and methodologies. As a summary, taxonomy is assigned using a hierarchical strategy prioritizing VSEARCH-GTDB, followed by VSEARCH with a field-specific database, then DADA2-GTDB, and finally DADA2 with the field-specific database. Species-level gaps in VSEARCH assignments (NA assigned by VSEARCH) are supplemented using DADA2 classifications.
 
@@ -24,9 +24,9 @@ Finally for combining the annotation results from Vsearch and DADA2, we prioriti
 
 At the end of the workflow, we generate two versions of taxonomy annotation files, allowing users to choose the format that best fits their downstream analysis:
 
-dada2_all_databases_merged.csv Contains taxonomic annotations from all databases side by side (e.g., GTDB, SILVA, RDP, URE), without combining or prioritizing them. This file is useful for users who want to compare database outputs directly.
+dada2_all_databases_merged.csv Contains taxonomic annotations from all databases side by side (e.g., GTDB, SILVA, RDP, field-specific (e.g. URE)), without combining or prioritizing them. This file is useful for users who want to compare database outputs directly.
 
-vsearch_dada2_merged.tsv Provides a single, merged annotation per ASV by combining VSEARCH and DADA2 results from two main databases: the GTDB reference database and a field-specific database ( here URE).
+vsearch_dada2_merged.tsv Provides a single, merged annotation per ASV by combining VSEARCH and DADA2 results from two main databases: the GTDB reference database and a field-specific database (here URE).
 
 <br>
 
@@ -58,7 +58,7 @@ Certain rules are executed only when their corresponding parameters are set to T
 
 The **filterNsRaw** and **primerRMVinvestigation** rules are used to examine primers in reads both before and after removal and are triggered if the **primer_removal** parameter is set to True.
 
-Lastly, the **vsearchURE** rule is executed if the **URE_after_GTDB** parameter is set to True, enabling the use of the URE database to annotate ASVs that could not be assigned using GTDB.
+Lastly, the **vsearchFieldDB** rule is executed if the **DB_after_GTDB** parameter is set to True, enabling the use of the field-specific (e.g. URE) database to annotate ASVs that could not be assigned using GTDB.
 
 <br>
 <br>
@@ -281,27 +281,28 @@ python utils/scripts/common/prepare.py <DIR>
 | input_dir | path of the input directory | "/home/data" |
 | output_dir | name and path to the output directory | "output" |
 | path | path to the main snakemake directory | "/home/analysis/dada2_snakemake_workflow" |
-| forward_read_suffix, reverse_read_suffix | Forward and reverse reads format | "_R1" "_R2" |
-| primer_removal | Set to TRUE to remove primers | False |
-| fwd_primer | Forward primer sequence | "CTGTCTCTTAT..." |
-| rev_primer | Reverse primer sequence | "CTGTCTCTTAT..." |
-| fwd_primer_rc | Forward primer reverse complement sequence | "CTGTCTCTTAT..." |
-| rev_primer_rc | Reverse primer reverse complement sequence | "CTGTCTCTTAT..." |
+| forward_read_suffix, reverse_read_suffix | Forward and reverse reads format | "_R1_001" "_R2_001" |
+| primer_removal | set to TRUE to remove primers | True |
+| primer_investigation | checking for primers presence before and after removal | True |
+| fwd_primer | forward primer sequence | "CTGTCTCTTAT..." empty as default |
+| rev_primer | reverse primer sequence | "CTGTCTCTTAT..." empty as default |
+| compression_suffix | reads compression format | ".fastq.gz" |
 | min_overlap | minimum overlap length for primer detection | 15 |
 | max_e | maximum error rate allowed in primer match/detection | 0.1 |
-| qf, qr | quality trimming score | numeric e.g. 20 |
-| min_len | minimum length of reads kept | numeric e.g. 50 |
+| --nextseq-trim | quality trimming score | numeric e.g. 20 |
+| min_len | minimum length of reads kept | numeric e.g. 60 |
 | Positive_samples | positive control samples to visualize in qc report | "pos_ctrl_1\\|pos_ctrl_2" |
 | threads | number of threads to be used | numeric e.g. 20 |
 | truncLen | trimming reads at this length | numeric e.g. 260, separately set for forward and reverse reads |
 | maxEE | After truncation, reads with higher than maxEE "expected errors" will be discarded. Expected errors are calculated from the nominal definition of the quality score: EE= sum(10^(-Q/10)) | numeric e.g. 2, separately set for forward and reverse reads  |
 | truncQ | Truncating reads at the first instance of a quality score less than or equal to truncQ | 2 |
-| learn_nbases | minimum number of total bases to use for error rate learning | 500000000 |
+| nRecords | number of records to sample for QC plots | 100,000 |
+| learn_nbases | minimum number of total bases to use for error rate learning | 800,000,000 |
 | Negative_samples | samples to be excluded for the learning error rates step | "NTC_S221_L001\\|Lib_neg_S222_L001" |
 | chimera_method | method used for chimera detection | consensus |
 | Identity | minimum percent identity for a hit to be considered a match | percentage e.g. 0.993 |
 | Maxaccepts | maximum number of hits to consider per query | numeric e.g. 30 |
-| URE_after_GTDB | running URE after GTDB using VSEARCH taxonomy assignment | False |
+| DB_after_GTDB | running field-specific database after GTDB using VSEARCH taxonomy assignment | False |
 | RDP_dbs, vsearch_DBs | databases used for taxonomy assignment | |
 
 <br>
@@ -343,14 +344,14 @@ To make sure that the pipeline is run completely, we need to check the log and o
 | ./output/taxonomy | GTDB_RDP.tsv, GTDB_RDP_boostrap.rds | RDP classified annotations using GTDB DB and taxonomy assignmnet scores out of 100 |
 | ./output/taxonomy | RDP_RDP.tsv, RDP_RDP_boostrap.rds | RDP classified annotations using RDP DB and taxonomy assignmnet scores out of 100 |
 | ./output/taxonomy | Silva_RDP.tsv, Saliva_RDP_boostrap.rds | RDP classified annotations using Saliva DB and taxonomy assignmnet scores out of 100 |
-| ./output/taxonomy | URE_RDP.tsv, URE_RDP_boostrap.rds | RDP classified annotations using URE DB and taxonomy assignmnet scores out of 100 |
-| ./output/taxonomy | annotation_combined_dada2.txt | ASV abundance and their annotation from all 4 databases (GTDB, RDP, Saliva, URE) side by side across samples |
+| ./output/taxonomy | field-specific_DB_RDP.tsv, field-specific_DB_RDP_boostrap.rds | RDP classified annotations using field-specific DB and taxonomy assignmnet scores out of 100 |
+| ./output/taxonomy | annotation_combined_dada2.txt | ASV abundance and their annotation from all 4 databases (GTDB, RDP, Saliva, field-specific DB) side by side across samples |
 | ./output/vserach/GTDB/ | Vsearh_GTDB_raw.tsv | Raw output result from vsearch with tab-separated uclust-like format using GTDB database |
-| ./output/vsearch/URE/ | Vsearh_URE_raw.tsv | Raw output result from vsearch with tab-separated uclust-like format using URE database only for ASVs that were not annotated by vsearch using GTDB DB |
+| ./output/vsearch/field-specific_DB/ | Vsearh_field-specific_DB_raw.tsv | Raw output result from vsearch with tab-separated uclust-like format using field-specific database only for ASVs that were not annotated by vsearch using GTDB DB |
 | ./output/vsearch/ | vsearch/Final_uncollapsed_output.tsv | Vsearch assignment for ASVs, hits in separate rows |
 | ./output/vsearch/ | vsearch/Final_colapsed_output.tsv | Vsearch assignment for unique ASVs per row with different hits at species level collapsed |
 | ./output/taxonomy/ | vsearch_output.tsv | Taxonomy assignmnet reaults using vsearch and GTDB |
-| ./output/taxonomy | vsearch_dada2_merged.tsv | merged vsearch (GTDB/URE) and dada2 annotations (GTDB/RDP?Silva/URE), corresponding abundance across samples, and final annotation with priority of vsearch (GTDB then URE, if GTDB annotation is NA) over dada2 (GTDB then URE) |
+| ./output/taxonomy | vsearch_dada2_merged.tsv | merged vsearch (GTDB/field-specific DB) and dada2 annotations (GTDB/RDP?Silva/field-specific DB), corresponding abundance across samples, and final annotation with priority of vsearch (GTDB then field-specific DB, if GTDB annotation is NA) over dada2 (GTDB then field-specific DB) |
 | ./output/primer_status | primer_existance_raw.csv , primer_existance_trimmed.csv | Files to show primers existance before and after primer removal, if applicable |
 
 
