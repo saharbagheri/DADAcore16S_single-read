@@ -16,7 +16,7 @@ input_dir: "/home/data"   #With no slash at the end
 output_dir: "output"
 
 #path of the main snakemake directory
-path: "/home/analysis/FemMicro16S"
+path: "/home/analysis/DADAcore16S"
 
 # Reads format
 forward_read_suffix: "_R1_001"
