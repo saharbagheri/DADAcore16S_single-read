@@ -85,7 +85,7 @@ rule primerRMVinvestigation:
 
 rule cutAdaptQc:
     input:
-        rules.cutAdapt.output if config.get("primer_removal", True) else (unpack(lambda wc: dict(list_files.loc[wc.sample])),)
+        rules.cutAdapt.output if config.get("primer_removal", True) else rules.filterNsRaw.output
     output:
         R1= config["output_dir"]+"/cutadapt_qc/{sample}" + config["forward_read_suffix"] + config["compression_suffix"],
         R2= config["output_dir"]+"/cutadapt_qc/{sample}" + config["reverse_read_suffix"] + config["compression_suffix"]
