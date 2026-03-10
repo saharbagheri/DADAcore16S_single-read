@@ -10,7 +10,7 @@ This is a snakemake workflow for profiling microbial communities from amplicon s
 
 <br>
 
-In this pipeline, species-level taxonomy assignment is performed using two complementary methods: DADA2 and VSEARCH and incorporates annotations from different databases: GTDB, Silva, RDP, and a field-specific database (example here: URE).
+In this pipeline, species-level taxonomy assignment is performed using two complementary methods: DADA2 and VSEARCH and incorporates annotations from different databases: GTDB, Silva, RDP, and a field-specific database (example here: URE). We offer the option to incorporate a field-specific database into the pipeline (e.g., host- or environment-specific reference sets). When enabled, this database is prioritized after GTDB in both the VSEARCH and DADA2 workflows.
 
 1- DADA2: a naive Bayesian classifier method (https://pubmed.ncbi.nlm.nih.gov/17586664/), where a strict requirement of a 100% nucleotide identity match between the reference sequences and the query is employed. Four different databases were used for taxonomy assignmnet. However, for final assignmnet, GTDB assignment was used and where GTDB was unable to provide an annotation for an ASV, we utilized the corresponding annotation from the URE database.
 
