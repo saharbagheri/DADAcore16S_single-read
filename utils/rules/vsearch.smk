@@ -33,30 +33,30 @@ rule separate_vsearch_hits:
 
 
 
-rule vsearchURE:
+rule vsearchFieldDB:
     input:
         fas=rules.separate_vsearch_hits.output.GTDB_noHIT
     output:
-        output1= config["output_dir"]+"/vsearch/URE/Vsearch_URE_selected.tsv",
-        output2= config["output_dir"]+"/vsearch/URE/Vsearch_URE_raw.tsv"
+        output1= config["output_dir"]+"/vsearch/FieldDB/Vsearch_FieldDB_selected.tsv",
+        output2= config["output_dir"]+"/vsearch/FieldDB/Vsearch_FieldDB_raw.tsv"
     threads:
         config['threads']
     singularity:
         "apptainer/vsearch-1.0.0.sif"
     log:
-        config["output_dir"]+"/vsearch/logs/URE_logfile.txt"
+        config["output_dir"]+"/vsearch/logs/FieldDB_logfile.txt"
     params:
-        db=config["vsearch_DBs"]["URE"],
+        db=config["vsearch_DBs"]["FieldDB"],
         id=config["Identity"],
         maxaccepts=config["Maxaccepts"]
     shell:
         """
-        if [[ "{config[URE_after_GTDB]}" == True ]]; then
+        if [[ "{config[FieldDB_after_GTDB]}" == True ]]; then
             time vsearch --usearch_global {input.fas} --db {params.db}   --notrunclabels --userout {output.output1} \
             --userfields query+target+id --uc {output.output2} --id {params.id} --iddef 0 --log {log} \
             --threads {threads} --uc_allhits --maxaccepts {params.maxaccepts} --top_hits_only --strand both --gapopen '*'
         else
-            echo "Rule 'vsearchURE' is not executed."
+            echo "Rule 'vsearchFieldDB' is not executed."
         fi
         """
 
@@ -66,10 +66,10 @@ rule vsearchParse:
     input:
         GTDB_df=rules.separate_vsearch_hits.output.All_ASVs,
         annotation=rules.combining_annotations.output.table,
-        URE_df=lambda wildcards: [rules.vsearchURE.output.output1] if config.get("URE_after_GTDB", True) else []
+        FieldDB_df=lambda wildcards: [rules.vsearchFieldDB.output.output1] if config.get("FieldDB_after_GTDB", True) else []
     output:
         SemiParsed_uncollapsed=config["output_dir"]+"/vsearch/Final_uncollapsed_output.tsv",
-        parsed_collapsed_GTDB_URE=config["output_dir"]+"/vsearch/Final_colapsed_output.tsv",
+        parsed_collapsed_GTDB_FieldDB=config["output_dir"]+"/vsearch/Final_colapsed_output.tsv",
         Vsearch_final=config["output_dir"]+"/taxonomy/vsearch_tables/Vsearch_output.tsv",
         merged_final=config["output_dir"]+"/taxonomy/final_merged_tables/vsearch_dada2_merged.tsv"
     threads:
