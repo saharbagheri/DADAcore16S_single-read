@@ -337,20 +337,19 @@ To make sure that the pipeline is run completely, we need to check the log and o
 | ./output/snakemake_files | snakemake result files | A copy of all snakemake files and logs to avoid rewritting them by upcoming re-runs |
 | ./output/dada2 | seqtab_nochimeras.csv| ASVs abundance across sampels |
 | ./output/dada2 | Nreads.tsv | Read count at each step of the QC and following dada2 pipeline |
-| ./output/phylogeny | ASV_seq.fasta | Fasta sequences of the ASVs generated (headers are the same as the sequences) |
-| ./output/phylogeny | ASV_tree.nwk | Phylogenetic tree in newick format |
+| ./output/fasta_files | ASVs_id.fasta, ASVs_seqs.fasta, ASVs_tax.fasta | Fasta sequences of the ASVs generated (headers are different in these files) |
 | ./output/QC_html_report | qc_report.html | Quality, counts and length distribution of reads, prevalence/abundance and length distribution of ASVs in all samples, all samples bacterial composition profile |
-| ./output/taxonomy | GTDB_RDP.tsv, GTDB_RDP_boostrap.rds | RDP classified annotations using GTDB DB and taxonomy assignmnet scores out of 100 |
-| ./output/taxonomy | RDP_RDP.tsv, RDP_RDP_boostrap.rds | RDP classified annotations using RDP DB and taxonomy assignmnet scores out of 100 |
-| ./output/taxonomy | Silva_RDP.tsv, Saliva_RDP_boostrap.rds | RDP classified annotations using Saliva DB and taxonomy assignmnet scores out of 100 |
-| ./output/taxonomy | field-specific_DB_RDP.tsv, field-specific_DB_RDP_boostrap.rds | RDP classified annotations using field-specific DB and taxonomy assignmnet scores out of 100 |
-| ./output/taxonomy | annotation_combined_dada2.txt | ASV abundance and their annotation from all 4 databases (GTDB, RDP, Saliva, field-specific DB) side by side across samples |
+| ./output/taxonomy/dada2_tables/ | GTDB_RDP.tsv, GTDB_RDP_boostrap.rds | RDP classified annotations using GTDB DB and taxonomy assignmnet scores out of 100 |
+| ./output/taxonomy/dada2_tables/ | RDP_RDP.tsv, RDP_RDP_boostrap.rds | RDP classified annotations using RDP DB and taxonomy assignmnet scores out of 100 |
+| ./output/taxonomy/dada2_tables/ | Silva_RDP.tsv, Saliva_RDP_boostrap.rds | RDP classified annotations using Saliva DB and taxonomy assignmnet scores out of 100 |
+| ./output/taxonomy/dada2_tables/ | FieldDB_RDP.tsv, FieldDB_RDP_boostrap.rds | RDP classified annotations using field-specific DB and taxonomy assignmnet scores out of 100 |
+| ./output/taxonomy/dada2_tables/ | dada2_all_databases_merged.csv | ASV abundance and their annotation from all 4 databases (GTDB, RDP, Saliva, field-specific DB) side by side across samples |
 | ./output/vserach/GTDB/ | Vsearh_GTDB_raw.tsv | Raw output result from vsearch with tab-separated uclust-like format using GTDB database |
-| ./output/vsearch/field-specific_DB/ | Vsearh_field-specific_DB_raw.tsv | Raw output result from vsearch with tab-separated uclust-like format using field-specific database only for ASVs that were not annotated by vsearch using GTDB DB |
+| ./output/vsearch/FieldDB/ | Vsearh_FieldDB_raw.tsv | Raw output result from vsearch with tab-separated uclust-like format using field-specific database only for ASVs that were not annotated by vsearch using GTDB DB |
 | ./output/vsearch/ | vsearch/Final_uncollapsed_output.tsv | Vsearch assignment for ASVs, hits in separate rows |
 | ./output/vsearch/ | vsearch/Final_colapsed_output.tsv | Vsearch assignment for unique ASVs per row with different hits at species level collapsed |
 | ./output/taxonomy/ | vsearch_output.tsv | Taxonomy assignmnet reaults using vsearch and GTDB |
-| ./output/taxonomy | vsearch_dada2_merged.tsv | merged vsearch (GTDB/field-specific DB) and dada2 annotations (GTDB/RDP?Silva/field-specific DB), corresponding abundance across samples, and final annotation with priority of vsearch (GTDB then field-specific DB, if GTDB annotation is NA) over dada2 (GTDB then field-specific DB) |
+| ./output/taxonomy | vsearch_dada2_merged.tsv | merged vsearch (GTDB/field-specific DB) and dada2 annotations (GTDB/RDP/Silva/field-specific DB), corresponding abundance across samples, and final annotation with priority of vsearch (GTDB then field-specific DB, if GTDB annotation is NA) over dada2 (GTDB then field-specific DB) |
 | ./output/primer_status | primer_existance_raw.csv , primer_existance_trimmed.csv | Files to show primers existance before and after primer removal, if applicable |
 
 
