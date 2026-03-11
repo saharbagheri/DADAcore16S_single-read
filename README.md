@@ -87,46 +87,111 @@ Note: Results from different tools such as **fastqc, multiQC, seqkit**, and **da
 <details>
 <summary><h3 style="font-size: 24px;">1. Prerequisites</h3></summary>
     
-Please install the following tool before running this workflow. Please request an interactive session before starting the installation step by running the following command:
+Please install these following tools before running this workflow. 
+
+<br>
+
+Please request an interactive session before starting the installation step by running the following command:
 
 ```bash
     salloc --mem=20G --time=05:00:00
 ```
+<br>
 
-conda (miniconda): https://conda.io/projects/conda/en/stable/user-guide/install/linux.html
+### 1.1. conda (miniconda): 
+
+https://conda.io/projects/conda/en/stable/user-guide/install/linux.html
+
+<br>
+
+### 1.2. snakemake
+
+```bash
+
+# activate base environment
+conda activate base
+
+# install mamba (faster solver)
+conda install -c conda-forge mamba
+
+# create a dedicated snakemake environment
+mamba create -n snakemake -c conda-forge -c bioconda snakemake=7.32.4
+
+# activate environment
+conda activate snakemake
+
+# install pyyaml if needed
+pip install pyyaml
+
+```
+<br>
+
+### 1.3. singularity/apptainer
+If you're working on a cluster check if apptainner/singularity is already installed:
+
+```bash
+module avail singularity
+```
+
 
 </details>
 
-
 <details>
-
 <summary><h3 style="font-size: 24px;">2. Setting up environments</h3></summary>
+    
+
+### 2.1. Accessing Tools Using Apptainer/Singularity (Containerized Setup, recommended)
+
+
+<br>
+
+This step downloads the container images required for the pipeline and stores them in a local apptainer/ directory. Each image contains the software environment needed for a specific stage of the workflow (e.g., quality control, DADA2 processing, reporting, and taxonomy assignment). Using Apptainer ensures that all tools and dependencies are packaged in reproducible environments, allowing the pipeline to run consistently across different systems and clusters. The images are pulled from the Apptainer library and saved locally so they can be reused by the workflow without needing to rebuild the environments each time.
+
+**This is already implemented in the dada2_sbatch.sh script, which automatically pulls the required images and uses them when the job submission script is executed.**
+
+<br>
+
+For manual download:
+
+In the main Snakemake directory (where the Snakefile is located), create a new folder named apptainer. Navigate into this folder and download the required environment files using the commands provided below.
+
+```bash
+apptainer pull qc-1.0.0.sif library://saharbagheri/femmicro16s/qc:1.0.0
+
+apptainer pull dada2-1.0.0.sif library://saharbagheri/femmicro16s/dada2:1.0.0
+
+apptainer pull rmd-1.0.0.sif library://saharbagheri/femmicro16s/rmd:1.0.0
+
+apptainer pull vsearch-1.0.0.sif library://saharbagheri/femmicro16s/vsearch:1.0.0
+```
+
+Make sure to adjust the file names if you are using newer image versions or if your previous setup relied on local Conda environments. To do this, update all Snakemake rules in DADAcore16S/utils/rules/*.smk so that they reference either your local environments or the appropriate .sif files in the apptainer/ folder. The default configuration now uses the Apptainer images.
+
+If you need to manually change from conda to singularity for example, change:
+
+```bash
+conda: "dada2" #a local environment
+```
+
+to
+```bash
+apptainer: "apptainer/dada2-1.0.0.sif" #an apptainer image
+```
+
+<br>
+
+### 2.2 Manual Installation of Tools and Dependencies
+
+You can also set up all environments and install the tools manually if you need to use specific tool versions.
 
 Note: 
 After installation, verify the installation of each tool by executing its name followed by the flag '-h'. For example, use fastqc -h to check if FastQC is installed. This command should display the help information or usage instructions for the tool, indicating successful installation.
 
 For packages installed in R, initiate an R session within the same environment. Confirm the package installation by executing the library("package name") command, replacing "package name" with the actual name of the package. This will load the package in R, showing that it is properly installed and accessible in the current environment.
 
-Next we need to set up a few environments to use in different steps of the pipeline.
-
-#### 2.1. snakemake environment
-
-```bash
-conda activate base
-
-conda install -c conda-forge mamba
-
-mamba create --name snakemake
-
-mamba activate snakemake
-
-mamba install -c conda-forge -c bioconda snakemake==7.32.4
-
-pip install pyyaml
-```
 <br>
 
-#### 2.2. dada2 environment
+#### 2.2.1. dada2 environment
 
 To install r and dada2:
 
@@ -162,7 +227,7 @@ conda deactivate
 
 <br>
 
-#### 2.3. QC environment
+#### 2.2.2. QC environment
 
 To install fastqc, multiQC, cutadapt, and seqkit tools for quality control in a new environment:
 
@@ -180,7 +245,7 @@ conda deactivate
 
 <br>
 
-#### 2.4 fastree_mafft environment 
+#### 2.2.3 fastree_mafft environment 
 
 To create an environment for generating a phylogenetic tree and a fasta file of ASVs:
 
@@ -193,7 +258,7 @@ conda deactivate
 
 <br>
 
-#### 2.5 rmd environment
+#### 2.2.4 rmd environment
 
 ```bash
 conda create -n rmd
@@ -236,7 +301,7 @@ conda deactivate
 
 <br>
 
-#### 2.6 vsearch environment
+#### 2.2.5 vsearch environment
 
 ```
 conda create -n vsearch
@@ -260,7 +325,7 @@ Then please follow these steps to set up and run the pipeline.
 <br>
 
 ```bash
-git clone https://github.com/SycuroLab/FemMicro16S.git
+git clone https://github.com/IMCBioinformatics/DADAcore16S.git
 ```
 
 #### 3.3 Use prepare.py script to generate the samples.tsv file as an input for this pipeline using the following command: 
