@@ -63,13 +63,13 @@ Lastly, the **vsearchFieldDB** rule is executed if the **DB_after_GTDB** paramet
 <br>
 
 
-## Steps:
+## Main Tools:
 
 1-	**Cutadapt**: primer removal (if needed) and quality trimming of the reads.
 <br>
 <br> 
 
-2-	**DADA2**: filtering and trimming reads for quality, dereplicating for reducing computational complexity, estimating error rate to distinguish true biological variants, sample inference identifying true sequences and fixing errors, merging paired-end reads, removing chimera and finally assigning taxonomy (using naive Bayesian classifier method with a 100% nucleotide identity match between the reference sequences and the query) and constructing a phylogenetic tree.
+2-	**DADA2**: filtering and trimming reads for quality, dereplicating for reducing computational complexity, estimating error rate to distinguish true biological variants, sample inference identifying true sequences and fixing errors, merging paired-end reads, removing chimera and finally assigning taxonomy (using naive Bayesian classifier method with a 100% nucleotide identity match between the reference sequences and the query).
 <br> 
 <br> 
 
@@ -77,7 +77,7 @@ Lastly, the **vsearchFieldDB** rule is executed if the **DB_after_GTDB** paramet
 <br> 
 <br> 
 
-Note: Results from different tools such as fastqc, multiQC, seqkit, and dada2 were employed for quality control assessment at different points of the pipeline.
+Note: Results from different tools such as **fastqc, multiQC, seqkit**, and **dada2** were employed for quality control assessment at different points of the pipeline.
 
 <br> 
 
