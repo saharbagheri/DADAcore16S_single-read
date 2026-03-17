@@ -7,7 +7,6 @@ params:
    quality: ""
    out_dir: ""
    fwd_suffix: ""
-   rev_suffix: ""
    primer_removal: ""
    primer_investigation: ""
    Nread: ""
@@ -58,7 +57,6 @@ suppressMessages(library(htmlwidgets))
 quality <- params$quality
 out_dir <- params$out_dir
 fwd_suffix <- params$fwd_suffix
-rev_suffix <- params$rev_suffix
 primer_removal<- params$primer_removal
 primer_investigation <- params$primer_investigation
 Nread <- params$Nread
@@ -81,7 +79,7 @@ length_dist<-params$length_dist
 
 <br>
 
-The overall read quality plots offer a comprehensive assessment of the sequencing run's data integrity, highlighting raw and processed read quality. The plots display quality scores (Y-axis) against read positions (X-axis), showing a typical trend where quality decreases towards the end of the reads. The left panel represents forward reads quality and The right panel illustrates reverse reads quality aggregated for all samples. In gray-scale is a heat map of the frequency of each quality score at each base position is shown. The mean quality score at each position is shown by the green line, and the quartiles of the quality score distribution by the orange lines. The red line shows the scaled proportion of reads that extend to at least that position (this is more useful for other sequencing technologies, as Illumina reads are typically all the same length, hence a flat red line will be expected).
+The overall read quality plots offer a comprehensive assessment of the sequencing run's data integrity, highlighting raw and processed read quality. The plots display quality scores (Y-axis) against read positions (X-axis), showing a typical trend where quality decreases towards the end of the reads. The panel represents forward reads quality aggregated for all samples. In gray-scale is a heat map of the frequency of each quality score at each base position is shown. The mean quality score at each position is shown by the green line, and the quartiles of the quality score distribution by the orange lines. The red line shows the scaled proportion of reads that extend to at least that position (this is more useful for other sequencing technologies, as Illumina reads are typically all the same length, hence a flat red line will be expected).
 
 <br>
 
@@ -165,7 +163,6 @@ in_dir<-paste0(out_dir,"/seqkit_samples")
 
 
 forward_read_suffix <- fwd_suffix
-reverse_read_suffix <- rev_suffix
 primer_removal <- primer_removal
 primer_investigation<-primer_investigation
 
@@ -189,11 +186,11 @@ if (is.character(primer_investigation)) {
 
 ##reading files in and save them as objects
 if(primer_removal== TRUE & primer_investigation==TRUE){
-  object_names <- list.files(in_dir, pattern = paste0(forward_read_suffix,"|",reverse_read_suffix),full.names = T)
+  object_names <- list.files(in_dir, pattern = forward_read_suffix,full.names = T)
 } else {
-  object_names <- list.files(in_dir, pattern = paste0(forward_read_suffix,"|",reverse_read_suffix),full.names = T)
+  object_names <- list.files(in_dir, pattern = forward_read_suffix,full.names = T)
   object_names=object_names[!grepl(pattern = "primerRMV",x = object_names)]
-  names<-unique(sapply(strsplit(object_names,split=paste0(forward_read_suffix,"|",reverse_read_suffix)),`[`,1))
+  names<-unique(sapply(strsplit(object_names,split=forward_read_suffix),`[`,1))
 }
 
 for (i in 1:length(object_names)) {
@@ -222,7 +219,7 @@ for (i in raw_objects){
 
 
 
-object_names <- ls(pattern = paste0(forward_read_suffix,"|",reverse_read_suffix))
+object_names <- ls(pattern = forward_read_suffix)
 
 
 #### Loop over each file and change the column names and save them as a new object each
@@ -267,7 +264,7 @@ for (i in names){
 }
 
 
-reads <- c(forward_read_suffix,reverse_read_suffix)
+reads <- c(forward_read_suffix)
 
 
 # loop over the selected objects and add columns to them
@@ -339,7 +336,6 @@ for (i in files){
 
 final_data <- final_data %>%
   mutate(readtype = gsub(forward_read_suffix, "R1", readtype),
-         readtype = gsub(reverse_read_suffix, "R2", readtype),
          filetype = gsub("raw","Raw reads",filetype),
          filetype = gsub("primerRMV","After Primer Removal",filetype),
          filetype = gsub("cutadapt","After Quality Trimming",filetype),
@@ -378,48 +374,6 @@ if (primer_removal == TRUE) {
   # Convert to plotly and enable zooming
   plotly_p <- p +
     facet_wrap(~filetype, ncol = 3) 
-  plotly_p <- plotly_p %>% plotly::ggplotly() %>%
-    layout(xaxis = list(rangeslider = list(visible = TRUE), rangemode = "normal"),
-           xaxis2 = list(rangeslider = list(visible = TRUE), rangemode = "normal"),
-           xaxis3 = list(rangeslider = list(visible = TRUE), rangemode = "normal"),
-           yaxis = list(fixedrange = FALSE))
-  }
-
-
-
-# Show the plot
-plotly_p
-
-
-
-###Reverse
-
-p <- ggplot(final_data %>% filter(num_reads > 0 & readtype=="R2"), aes(x = read_length, y = num_reads, fill = sample_name)) +
-  geom_col(width = 1) +
-  theme_bw() +
-  labs(title = "All the reverse reads in all samples length distribution") +
-  xlab(NULL) +
-  ylab(NULL) +
-  theme(legend.position = "right")
-
-
-
-
-
-if (primer_removal == TRUE) {
-  # Convert to plotly and enable zooming
-  plotly_p <- p +
-    facet_wrap(~filetype, ncol = 4)
-  plotly_p <- plotly_p %>% plotly::ggplotly() %>%
-    layout(xaxis = list(rangeslider = list(visible = TRUE), rangemode = "normal"),
-           xaxis2 = list(rangeslider = list(visible = TRUE), rangemode = "normal"),
-           xaxis3 = list(rangeslider = list(visible = TRUE), rangemode = "normal"),
-           xaxis4 = list(rangeslider = list(visible = TRUE), rangemode = "normal"),
-           yaxis = list(fixedrange = FALSE))
-  } else {
-  # Convert to plotly and enable zooming
-  plotly_p <- p +
-    facet_wrap(~filetype, ncol = 3)
   plotly_p <- plotly_p %>% plotly::ggplotly() %>%
     layout(xaxis = list(rangeslider = list(visible = TRUE), rangemode = "normal"),
            xaxis2 = list(rangeslider = list(visible = TRUE), rangemode = "normal"),
@@ -532,7 +486,6 @@ datatable(reads1,
                          htmltools::em('not-Quality_Trimmed: Reads left after primer removal (if applicable) and quality trimming prior to DADA2 processing.'), htmltools::br(),
                          htmltools::em('not-Filtered: Reads left after eliminating sequences with ambiguous bases, high error rates, and short length.'), htmltools::br(),
                          htmltools::em('Denoised: Reads left with high quality and error-corrected sequences.'), htmltools::br(),
-                         htmltools::em('Merged: Reads left after removal of singletons and unmerged forward and reverse read pairs.'), htmltools::br(),
                          htmltools::em('Cleaned: Reads left after eliminating chimeric sequences,artifact sequences created during PCR due to partially extended strands binding to similar but different sequences.'), htmltools::br(),
                          htmltools::em('The sample called undetermined, containing the reads that could not be assigned to any samples, was excluded.')))
 
