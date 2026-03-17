@@ -20,7 +20,6 @@ path: "/home/analysis/DADAcore16S"
 
 # Reads format
 forward_read_suffix: "_R1_001"
-reverse_read_suffix: "_R2_001"
 
 # Reads compressed/decompressed
 compression_suffix: ".fastq.gz"     #".fastq.gz" or ".fastq"
@@ -45,7 +44,6 @@ primer_investigation: True #True or False
 #Reverse complement flag is added to the cutadapt code.
 primers:
 fwd_primer: ""
-rev_primer: ""
 
 
 ## Primer detection parameters
@@ -82,12 +80,11 @@ Positive_samples: ""
 #Truncation length (Make sure your reads still overlap after truncation in order to merge them later!)
 #truncLen:
 #  - 260
-#  - 220
+
 
 
 #Maximum error rate (maximum number of “expected errors” allowed in a read)
 maxEE:
-  - 2
   - 2
 
 #Truncate reads at the first instance of a quality score less than or equal to truncQ.
