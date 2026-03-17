@@ -14,20 +14,17 @@ if (!dir.exists(Dir)) {
 ####Checking presence of primers before removing the primers
 
 fnFs.filtN <- snakemake@input[['R1']]
-fnRs.filtN <- snakemake@input[['R2']]
 
 fnFs.cut <- snakemake@input[['cut1']]
-fnRs.cut <- snakemake@input[['cut2']]
+
 
 
 FWD <- snakemake@config[["fwd_primer"]]
-REV <- snakemake@config[["rev_primer"]]
 
 FWD <- gsub("\\^", "", FWD)
-REV <- gsub("\\^", "", REV)
+
 
 fwd_pattern <- paste0(snakemake@config[["forward_read_suffix"]],snakemake@config[["compression_suffix"]])
-rev_pattern <- paste0(snakemake@config[["reverse_read_suffix"]],snakemake@config[["compression_suffix"]])
 
 
 allOrients <- function(primer) {
@@ -40,8 +37,6 @@ allOrients <- function(primer) {
 }
 
 FWD.orients <- allOrients(FWD)
-REV.orients <- allOrients(REV)
-
 
 
 
@@ -52,17 +47,14 @@ primerHits <- function(primer, fn) {
 }
 
 
-
 primer_status_bf <- NULL
 
 for (i in 1:length(fnFs.filtN)) {
   temp <- rbind(
     FWD.ForwardReads = sapply(FWD.orients, primerHits, fn = fnFs.filtN[[i]]), 
-    FWD.ReverseReads = sapply(FWD.orients, primerHits, fn = fnRs.filtN[[i]]), 
-    REV.ForwardReads = sapply(REV.orients, primerHits, fn = fnFs.filtN[[i]]), 
-    REV.ReverseReads = sapply(REV.orients, primerHits, fn = fnRs.filtN[[i]])
+    FWD.ReverseReads = sapply(FWD.orients, primerHits, fn = fnRs.filtN[[i]])
   )
-  sample <- gsub(x = basename(fnFs.filtN[i]),pattern = paste0(fwd_pattern,"|",rev_pattern),replacement = "")
+  sample <- gsub(x = basename(fnFs.filtN[i]),pattern = paste0(fwd_pattern),replacement = "")
   row <- cbind(sample, temp)
   primer_status_bf <- rbind(primer_status_bf, row)
 }
@@ -77,10 +69,8 @@ primer_status_af=NULL
 	
 for (i in 1:length(fnFs.cut)) {
   temp<-rbind(FWD.ForwardReads = sapply(FWD.orients, primerHits, fn = fnFs.cut[[i]]), 
-              FWD.ReverseReads = sapply(FWD.orients, primerHits, fn = fnRs.cut[[i]]), 
-              REV.ForwardReads = sapply(REV.orients, primerHits, fn = fnFs.cut[[i]]), 
-              REV.ReverseReads = sapply(REV.orients, primerHits, fn = fnRs.cut[[i]]))
-  sample <- gsub(x = basename(fnFs.cut[i]),pattern = paste0(fwd_pattern,"|",rev_pattern),replacement = "") 
+              FWD.ReverseReads = sapply(FWD.orients, primerHits, fn = fnRs.cut[[i]])
+  sample <- gsub(x = basename(fnFs.cut[i]),pattern = paste0(fwd_pattern),replacement = "") 
   row=cbind(sample,temp)
   primer_status_af<-rbind(primer_status_af,row)
 }
