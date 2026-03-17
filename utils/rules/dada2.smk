@@ -1,11 +1,9 @@
 rule plotQualityProfileRaw:
     input:
-        R1= expand(config["input_dir"]+"/{sample}" + config["forward_read_suffix"] + config["compression_suffix"],sample=SAMPLES),
-        R2= expand(config["input_dir"]+"/{sample}" + config["reverse_read_suffix"] + config["compression_suffix"],sample=SAMPLES)
+        R1= expand(config["input_dir"]+"/{sample}" + config["forward_read_suffix"] + config["compression_suffix"],sample=SAMPLES)
     output:
-        R1=config["output_dir"]+"/figures/quality/rawFilterQualityPlots"+ config["forward_read_suffix"]+".png",
-        R2=config["output_dir"]+"/figures/quality/rawFilterQualityPlots"+ config["reverse_read_suffix"]+".png"
-    singularity:
+        R1=config["output_dir"]+"/figures/quality/rawFilterQualityPlots"+ config["forward_read_suffix"]+".png"
+singularity:
         "apptainer/dada2-1.0.0.sif"
     script:
         "../scripts/dada2/plotQualityProfile.R"
@@ -14,11 +12,9 @@ rule plotQualityProfileRaw:
 
 rule plotQualityProfileAfterQC:
     input:
-        R1= expand(config["output_dir"]+"/cutadapt_qc/{sample}" + config["forward_read_suffix"] + config["compression_suffix"],sample=SAMPLES),
-        R2= expand(config["output_dir"]+"/cutadapt_qc/{sample}" + config["reverse_read_suffix"] + config["compression_suffix"],sample=SAMPLES)
+        R1= expand(config["output_dir"]+"/cutadapt_qc/{sample}" + config["forward_read_suffix"] + config["compression_suffix"],sample=SAMPLES) 
     output:
-        R1=config["output_dir"]+"/figures/quality/afterQCQualityPlots"+ config["forward_read_suffix"]+".png",
-        R2=config["output_dir"]+"/figures/quality/afterQCQualityPlots"+ config["reverse_read_suffix"]+".png"
+        R1=config["output_dir"]+"/figures/quality/afterQCQualityPlots"+ config["forward_read_suffix"]+".png"
     singularity:
         "apptainer/dada2-1.0.0.sif"
     script:
@@ -28,15 +24,12 @@ rule plotQualityProfileAfterQC:
 
 rule dada2Filter:
     input:
-        R1= expand(config["output_dir"]+"/cutadapt_qc/{sample}" + config["forward_read_suffix"] + config["compression_suffix"],sample=SAMPLES),
-        R2= expand(config["output_dir"]+"/cutadapt_qc/{sample}" + config["reverse_read_suffix"] + config["compression_suffix"],sample=SAMPLES)
+        R1= expand(config["output_dir"]+"/cutadapt_qc/{sample}" + config["forward_read_suffix"] + config["compression_suffix"],sample=SAMPLES)
     output:
-        R1= expand(config["output_dir"]+"/dada2/dada2_filter/{sample}" + config["forward_read_suffix"] + config["compression_suffix"],sample=SAMPLES),
-        R2= expand(config["output_dir"]+"/dada2/dada2_filter/{sample}" + config["reverse_read_suffix"] + config["compression_suffix"],sample=SAMPLES),
+        R1= expand(config["output_dir"]+"/dada2/dada2_filter/{sample}" + config["forward_read_suffix"] + config["compression_suffix"],sample=SAMPLES)
         nreads= temp(config["output_dir"]+"/dada2/Nreads_filtered.txt")
     params:
-        samples=SAMPLES,
-        nread=config["output_dir"]+"/dada2/Nreads_filtered.txt"
+        samples=SAMPLES
     threads:
          config["threads"]
     singularity:
@@ -48,11 +41,9 @@ rule dada2Filter:
 
 rule plotQualityProfileAfterdada2:
     input:
-        R1= rules.dada2Filter.output.R1,
-        R2= rules.dada2Filter.output.R2
+        R1= rules.dada2Filter.output.R1
     output:
-        R1=config["output_dir"]+"/figures/quality/afterdada2FilterQualityPlots"+ config["forward_read_suffix"]+".png",
-        R2=config["output_dir"]+"/figures/quality/afterdada2FilterQualityPlots"+ config["reverse_read_suffix"]+".png"
+        R1=config["output_dir"]+"/figures/quality/afterdada2FilterQualityPlots"+ config["forward_read_suffix"]+".png"
     singularity:
         "apptainer/dada2-1.0.0.sif"
     script:
@@ -62,13 +53,10 @@ rule plotQualityProfileAfterdada2:
 
 rule learnErrorRates:
     input:
-        R1= rules.dada2Filter.output.R1,
-        R2= rules.dada2Filter.output.R2
+        R1= rules.dada2Filter.output.R1
     output:
         errR1= config["output_dir"]+"/dada2/learnErrorRates/ErrorRates" + config["forward_read_suffix"]+ ".rds",
-        errR2 = config["output_dir"]+"/dada2/learnErrorRates/ErrorRates" + config["reverse_read_suffix"]+ ".rds",
-        plotErr1=config["output_dir"]+"/figures/errorRates/ErrorRates" + config["forward_read_suffix"]+ ".pdf",
-        plotErr2=config["output_dir"]+"/figures/errorRates/ErrorRates" + config["reverse_read_suffix"]+ ".pdf"
+        plotErr1=config["output_dir"]+"/figures/errorRates/ErrorRates" + config["forward_read_suffix"]+ ".pdf"
     threads:
         config['threads']
     singularity:
@@ -83,14 +71,10 @@ rule learnErrorRates:
 rule process_sample:
     input:
         R1= config["output_dir"]+"/dada2/dada2_filter/{sample}" + config["forward_read_suffix"] + config["compression_suffix"],
-        R2= config["output_dir"]+"/dada2/dada2_filter/{sample}" + config["reverse_read_suffix"] + config["compression_suffix"],
-        errR1= rules.learnErrorRates.output.errR1,
-        errR2= rules.learnErrorRates.output.errR2
+        errR1= rules.learnErrorRates.output.errR1
     output:
         ddF = config["output_dir"]+"/dada2/intermediate_files/ddF_{sample}.rds",
-        ddR = config["output_dir"]+"/dada2/intermediate_files/ddR_{sample}.rds",
-        derepF = config["output_dir"] + "/dada2/intermediate_files/derepF_{sample}.rds",
-        derepR = config["output_dir"] + "/dada2/intermediate_files/derepR_{sample}.rds"
+        derepF = config["output_dir"] + "/dada2/intermediate_files/derepF_{sample}.rds"
     threads:
         config["generateSeqtab_threads"]
     singularity:
@@ -103,9 +87,7 @@ rule merge_seqtabs:
     input:
         # This expands to a list of per-sample RDS files using the SAMPLES list.
         ddF = expand(config["output_dir"]+"/dada2/intermediate_files/ddF_{sample}.rds",sample=SAMPLES),
-        ddR = expand(config["output_dir"]+"/dada2/intermediate_files/ddR_{sample}.rds",sample=SAMPLES),
-        derepF = expand(config["output_dir"] + "/dada2/intermediate_files/derepF_{sample}.rds",sample=SAMPLES),
-        derepR = expand(config["output_dir"] + "/dada2/intermediate_files/derepR_{sample}.rds", sample=SAMPLES)
+        derepF = expand(config["output_dir"] + "/dada2/intermediate_files/derepF_{sample}.rds",sample=SAMPLES)
     output:
         seqtab = config["output_dir"] + "/dada2/seqtab_with_chimeras.rds",
         nreads = config["output_dir"] + "/dada2/Nreads_with_chimeras.txt"
