@@ -9,7 +9,7 @@ filtFs = snakemake@input[['R1']]
 #The number of records to sample from the fastq file.
 nRecords= snakemake@config[['nRecords']]
 
-exists <- file.exists(filtFs) & file.exists(filtRs)
+exists <- file.exists(filtFs)
 filtFs <- filtFs[exists]
 
 
