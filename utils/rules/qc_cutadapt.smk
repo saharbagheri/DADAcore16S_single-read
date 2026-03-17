@@ -2,8 +2,7 @@ rule fastqcRaw:
     input:
         unpack(lambda wc: dict(list_files.loc[wc.sample]))
     output:
-        R1= config["output_dir"] + "/fastqc_raw/{sample}" + config["forward_read_suffix"] + "_fastqc.html",
-        R2= config["output_dir"] + "/fastqc_raw/{sample}" + config["reverse_read_suffix"] + "_fastqc.html"
+        R1= config["output_dir"] + "/fastqc_raw/{sample}" + config["forward_read_suffix"] + "_fastqc.html"
     resources:
         tmpdir=temp(directory(config["output_dir"] + "/fastqc_raw/tmp/"))
     singularity:
@@ -17,8 +16,7 @@ rule fastqcRaw:
 
 rule multiqcRaw:
     input:
-        R1 =expand(config["output_dir"]+"/fastqc_raw/{sample}" + config["forward_read_suffix"] +"_fastqc.html",sample=SAMPLES),
-        R2 =expand(config["output_dir"]+"/fastqc_raw/{sample}" + config["reverse_read_suffix"] +"_fastqc.html",sample=SAMPLES)
+        R1 =expand(config["output_dir"]+"/fastqc_raw/{sample}" + config["forward_read_suffix"] +"_fastqc.html",sample=SAMPLES)
     output:
         config["output_dir"]+"/multiqc_raw/multiqc_report_raw.html"
     singularity:
@@ -34,11 +32,9 @@ rule multiqcRaw:
 
 rule cutAdapt:
     input:
-        R1=rules.filterNsRaw.output.R1,
-        R2=rules.filterNsRaw.output.R2
+        R1=rules.filterNsRaw.output.R1
     output:
-        R1= config["output_dir"]+"/cutadapt/{sample}" + config["forward_read_suffix"] + config["compression_suffix"],
-        R2= config["output_dir"]+"/cutadapt/{sample}" + config["reverse_read_suffix"] + config["compression_suffix"]
+        R1= config["output_dir"]+"/cutadapt/{sample}" + config["forward_read_suffix"] + config["compression_suffix"]
     params:
         m=config["min_len"],
         o=config["min_overlap"],
@@ -51,11 +47,11 @@ rule cutAdapt:
         """
         if [[ "{config[primer_removal]}" == "True" ]]; then
             cutadapt -m {params.m} -O {params.o} -e {params.e} --discard-untrimmed \
-                -g {config[fwd_primer]} -G {config[rev_primer]} --revcomp \
-                -o {output.R1} -p {output.R2} \
-                {input.R1} {input.R2}
+                -g {config[fwd_primer]} --revcomp \
+                -o {output.R1} \
+                {input.R1}
         else
-            touch {output.R1} {output.R2}
+            touch {output.R1}
             echo "Rule 'cutAdapt' is not executed because 'primer_removal' is set to 'false' in the config file."
         fi
         """
@@ -66,9 +62,7 @@ rule cutAdapt:
 rule primerRMVinvestigation:
     input:
         R1= expand(config["output_dir"]+"/filtN/{sample}" + config["forward_read_suffix"] + config["compression_suffix"],sample=SAMPLES),
-        R2= expand(config["output_dir"]+"/filtN/{sample}" + config["reverse_read_suffix"] + config["compression_suffix"],sample=SAMPLES),
-        cut1= expand(config["output_dir"]+"/cutadapt/{sample}" + config["forward_read_suffix"] + config["compression_suffix"],sample=SAMPLES),
-        cut2= expand(config["output_dir"]+"/cutadapt/{sample}" + config["reverse_read_suffix"] + config["compression_suffix"],sample=SAMPLES)
+        cut1= expand(config["output_dir"]+"/cutadapt/{sample}" + config["forward_read_suffix"] + config["compression_suffix"],sample=SAMPLES)
     params:
         dir=config["output_dir"]+"/primer_status/"
     output:
@@ -87,8 +81,7 @@ rule cutAdaptQc:
     input:
         rules.cutAdapt.output if config.get("primer_removal", True) else rules.filterNsRaw.output
     output:
-        R1= config["output_dir"]+"/cutadapt_qc/{sample}" + config["forward_read_suffix"] + config["compression_suffix"],
-        R2= config["output_dir"]+"/cutadapt_qc/{sample}" + config["reverse_read_suffix"] + config["compression_suffix"]
+        R1= config["output_dir"]+"/cutadapt_qc/{sample}" + config["forward_read_suffix"] + config["compression_suffix"]
     params:
         nextseqTrim=config["nextseqTrim"],
         m=config["min_len"]
@@ -97,17 +90,15 @@ rule cutAdaptQc:
     singularity:
         "apptainer/qc-1.0.0.sif"
     shell:
-        "cutadapt --nextseq-trim={params.nextseqTrim} -m {params.m} -o {output.R1} -p {output.R2} {input} "
+        "cutadapt --nextseq-trim={params.nextseqTrim} -m {params.m} -o {output.R1} {input} "
 
 
 
 rule fastqcFilt:
     input:
-        R1= rules.cutAdaptQc.output.R1,
-        R2= rules.cutAdaptQc.output.R2
+        R1= rules.cutAdaptQc.output.R1
     output:
-        R1= config["output_dir"]+"/fastqc_filt/{sample}"+ config["forward_read_suffix"] + "_fastqc.html",
-        R2= config["output_dir"]+"/fastqc_filt/{sample}"+ config["reverse_read_suffix"] + "_fastqc.html"
+        R1= config["output_dir"]+"/fastqc_filt/{sample}"+ config["forward_read_suffix"] + "_fastqc.html"
     resources:
         tempdir=temp(directory(config["output_dir"] + "/fastqc_filt/tmp/"))
     singularity:
@@ -115,14 +106,13 @@ rule fastqcFilt:
     params:
          fastqc_dir=directory(config["output_dir"]+ "/fastqc_filt")
     shell: 
-        "fastqc -o {params.fastqc_dir} -d {resources.tmpdir} {input.R1} {input.R2} " 
+        "fastqc -o {params.fastqc_dir} -d {resources.tmpdir} {input.R1} " 
 
 
 
 rule multiqcFilt:
     input:
-        R1= expand(config["output_dir"]+"/fastqc_filt/{sample}"+ config["forward_read_suffix"] + "_fastqc.html",sample=SAMPLES),
-        R2= expand(config["output_dir"]+"/fastqc_filt/{sample}"+ config["reverse_read_suffix"] + "_fastqc.html",sample=SAMPLES)
+        R1= expand(config["output_dir"]+"/fastqc_filt/{sample}"+ config["forward_read_suffix"] + "_fastqc.html",sample=SAMPLES)
     output:
         config["output_dir"]+"/multiqc_filt/multiqc_report_filtered.html"
     singularity:
