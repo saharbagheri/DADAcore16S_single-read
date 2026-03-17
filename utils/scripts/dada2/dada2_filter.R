@@ -2,14 +2,11 @@ suppressMessages(library(dada2))
 
 
 fnFs <- snakemake@input[['R1']]
-fnRs <- snakemake@input[['R2']]
 
 filtFs <- snakemake@output[['R1']]
-filtRs <- snakemake@output[['R2']]
 
 
 track.filt <- filterAndTrim(fnFs,filtFs, 
-                            fnRs,filtRs, 
 #                            truncLen= snakemake@config[["truncLen"]],
                             maxN=0,
                             maxEE=snakemake@config[["maxEE"]], 
