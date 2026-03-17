@@ -345,11 +345,10 @@ python utils/scripts/common/prepare.py <DIR>
 | input_dir | path of the input directory | "/home/data" |
 | output_dir | name and path to the output directory | "output" |
 | path | path to the main snakemake directory | "/home/analysis/DADAcore16S" |
-| forward_read_suffix, reverse_read_suffix | Forward and reverse reads format | "_R1_001" "_R2_001" |
+| forward_read_suffix| Forward reads format | "_R1_001" |
 | primer_removal | set to TRUE to remove primers | True |
 | primer_investigation | checking for primers presence before and after removal | True |
 | fwd_primer | forward primer sequence | "CTGTCTCTTAT..." empty as default |
-| rev_primer | reverse primer sequence | "CTGTCTCTTAT..." empty as default |
 | compression_suffix | reads compression format | ".fastq.gz" |
 | min_overlap | minimum overlap length for primer detection | 15 |
 | max_e | maximum error rate allowed in primer match/detection | 0.1 |
@@ -358,7 +357,7 @@ python utils/scripts/common/prepare.py <DIR>
 | Positive_samples | positive control samples to visualize in qc report | "pos_ctrl_1\\|pos_ctrl_2" |
 | threads | number of threads to be used | numeric e.g. 20 |
 | truncLen | trimming reads at this length | numeric e.g. 260, separately set for forward and reverse reads |
-| maxEE | After truncation, reads with higher than maxEE "expected errors" will be discarded. Expected errors are calculated from the nominal definition of the quality score: EE= sum(10^(-Q/10)) | numeric e.g. 2, separately set for forward and reverse reads  |
+| maxEE | After truncation, reads with higher than maxEE "expected errors" will be discarded. Expected errors are calculated from the nominal definition of the quality score: EE= sum(10^(-Q/10)) | numeric e.g. 2 |
 | truncQ | Truncating reads at the first instance of a quality score less than or equal to truncQ | 2 |
 | nRecords | number of records to sample for QC plots | 100,000 |
 | learn_nbases | minimum number of total bases to use for error rate learning | 800,000,000 |
