@@ -29,6 +29,6 @@ rule qc_report:
         config["output_dir"]+"/QC_html_report/"+"qc_report.html",
     shell:
         """
-        Rscript -e 'rmarkdown::render(input="{params.path}/utils/scripts/dada2/qc_report.Rmd",output_file="{params.path}/{output}", params= list(quality="{params.quality}", out_dir="{params.outdir}", fwd_suffix= "{params.fwd}", rev_suffix="{params.rev}", primer_removal= "{params.primer_removal}", primer_investigation= "{params.primer_investigation}", Nread ="{params.Nread}", seqtab="{params.seqtab}", taxonomy="{params.taxonomy}", pos="{params.pos}", ref="{params.ref}", source="{params.source}", krona="{params.krona}", length_dist="{params.length_distribution}"))'
+        Rscript -e 'rmarkdown::render(input="{params.path}/utils/scripts/dada2/qc_report.Rmd",output_file="{params.path}/{output}", params= list(quality="{params.quality}", out_dir="{params.outdir}", fwd_suffix= "{params.fwd}", primer_removal= "{params.primer_removal}", primer_investigation= "{params.primer_investigation}", Nread ="{params.Nread}", seqtab="{params.seqtab}", taxonomy="{params.taxonomy}", pos="{params.pos}", ref="{params.ref}", source="{params.source}", krona="{params.krona}", length_dist="{params.length_distribution}"))'
         """
 
