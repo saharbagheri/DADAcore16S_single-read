@@ -26,7 +26,7 @@ rule dada2Filter:
     input:
         R1= expand(config["output_dir"]+"/cutadapt_qc/{sample}" + config["forward_read_suffix"] + config["compression_suffix"],sample=SAMPLES)
     output:
-        R1= expand(config["output_dir"]+"/dada2/dada2_filter/{sample}" + config["forward_read_suffix"] + config["compression_suffix"],sample=SAMPLES)
+        R1= expand(config["output_dir"]+"/dada2/dada2_filter/{sample}" + config["forward_read_suffix"] + config["compression_suffix"],sample=SAMPLES),
         nreads= temp(config["output_dir"]+"/dada2/Nreads_filtered.txt")
     params:
         samples=SAMPLES
