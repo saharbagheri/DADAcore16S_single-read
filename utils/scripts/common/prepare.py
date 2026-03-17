@@ -59,21 +59,25 @@ def main(path):
     read_files = [file for file in pool.map(process_file, files) if file]
 
     # Extracting unique sample IDs
+    pattern = re.compile(r"(.+?)(?:_R1_|_R1\.|_1\.)")
+
+    R1_files = []
     unique_sample_ids = set()
+
     for file in read_files:
         base_name = os.path.basename(file)
-        sample_id = re.split(r"_R[1]_|_R[1]\.|_[1]\.", base_name)[0]
-        unique_sample_ids.add(sample_id)
-
-    # Separating files into R1 and R2
-    R1_files = [file for file in read_files if '_R1_' in file or '_1.' in file]
+        match = pattern.search(base_name)
+        if match:
+            sample_id = match.group(1)
+            unique_sample_ids.add(sample_id)
+            R1_files.append(file)
 
 
     # Creating the final tab-delimited file
     with open(os.path.join(samples_dir, 'samples.tsv'), 'w') as output_file:
         output_file.write("Sample_ID\tR1\n")
         for id in sorted(unique_sample_ids):
-            R1_file = next((f for f in R1_files if re.split(r"_R[1]_|_R[1]\.|_[1]\.", os.path.basename(f))[0] == id), None)
+            R1_file = next(f for f in R1_files if pattern.search(os.path.basename(f)).group(1) == id)
             output_file.write(f"{id}\t{R1_file}\n")
 
 
@@ -83,3 +87,4 @@ if __name__ == "__main__":
         print("Usage: python script.py <directory_path>")
         sys.exit(1)
     main(sys.argv[1])
+    
