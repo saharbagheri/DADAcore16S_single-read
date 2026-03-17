@@ -29,7 +29,6 @@ rule all:
         expand(config["output_dir"]+"/taxonomy/dada2_tables/{ref}_RDP.tsv",ref= config['RDP_dbs'].keys()),
         config["output_dir"]+"/dada2/Nreads.tsv",
         config["output_dir"]+"/dada2/Nreads_filtered.txt",
-        config["output_dir"]+"/dada2/percent_phix.txt",
         config["output_dir"]+"/multiqc_filt/multiqc_report_filtered.html",
         config["output_dir"]+"/multiqc_raw/multiqc_report_raw.html",
         config["output_dir"]+"/seqkit_samples/"+"temp_raw.txt",
