@@ -1,5 +1,5 @@
 
-# DADAcore16S
+# DADAcore16S for single (Forward) reads
 
 [![Conda](https://img.shields.io/badge/conda-v22.11.1-lightgrey)](https://docs.conda.io/en/latest/)
 [![Snakemake](https://img.shields.io/badge/snakemake-7.32.4-blue)](https://snakemake.bitbucket.io)
