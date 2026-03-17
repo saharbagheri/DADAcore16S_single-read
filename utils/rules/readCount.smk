@@ -15,11 +15,10 @@ rule numSeqParse:
     input:rules.rawReadCount.output
     output:config["output_dir"]+"/dada2/Parsed_rawReadCount.txt"
     params:
-        R1= config["forward_read_suffix"]+config["compression_suffix"],
-        R2= config["reverse_read_suffix"]+config["compression_suffix"]
+        R1= config["forward_read_suffix"]+config["compression_suffix"]
     shell:
         """
-        sed 's/,//g' {input} | sed -n '1p;0~2p' | awk '{{print $1,$4}}' | rev | cut -d'/' -f 1 | rev | sed 's/{params.R1}\\|{params.R2}$//'  | tr ' ' '\\t' > {output}
+        sed 's/,//g' {input} | sed -n '1p;0~2p' | awk '{{print $1,$4}}' | rev | cut -d'/' -f 1 | rev | sed 's/{params.R1}//'  | tr ' ' '\\t' > {output}
         """
 
 
