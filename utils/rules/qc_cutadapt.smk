@@ -9,7 +9,7 @@ rule fastqcRaw:
         "apptainer/qc-1.0.0.sif"
     params:
         output=directory(config["output_dir"]+ "/fastqc_raw")
-    shell: "fastqc -o {params.output} -d {resources.tmpdir} {input.R1} {input.R2} "
+    shell: "fastqc -o {params.output} -d {resources.tmpdir} {input.R1} "
 
 
 
