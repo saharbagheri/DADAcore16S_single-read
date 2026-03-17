@@ -14,7 +14,6 @@ rule qc_report:
         path=config["path"],
         outdir=config["path"]+"/"+ config["output_dir"],
         fwd=config["forward_read_suffix"],
-        rev=config["reverse_read_suffix"],
         primer_removal=config["primer_removal"],
         primer_investigation=config["primer_investigation"],
         Nread=config["path"]+"/"+config["output_dir"]+"/dada2/Nreads.tsv",
