@@ -23,5 +23,5 @@ colnames(track.filt) = c('afterCutadapt','filtered')
 track.filt<-data.frame(track.filt)
 track.filt <- track.filt[track.filt$filtered > 0, ]
 
-write.table(track.filt,snakemake@params[['nread']],  sep='\t')
+write.table(track.filt,snakemake@output[['nread']],  sep='\t')
 
