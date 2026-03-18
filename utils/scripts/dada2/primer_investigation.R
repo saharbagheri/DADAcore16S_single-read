@@ -50,12 +50,9 @@ primerHits <- function(primer, fn) {
 primer_status_bf <- NULL
 
 for (i in 1:length(fnFs.filtN)) {
-  temp <- rbind(
-    FWD.ForwardReads = sapply(FWD.orients, primerHits, fn = fnFs.filtN[[i]]), 
-    FWD.ReverseReads = sapply(FWD.orients, primerHits, fn = fnRs.filtN[[i]])
-  )
+  FWD_ForwardReads = sapply(FWD.orients, primerHits, fn = fnFs.filtN[[i]])
   sample <- gsub(x = basename(fnFs.filtN[i]),pattern = paste0(fwd_pattern),replacement = "")
-  row <- cbind(sample, temp)
+  row <- cbind(sample, FWD_ForwardReads)
   primer_status_bf <- rbind(primer_status_bf, row)
 }
 
@@ -68,10 +65,9 @@ write.csv(primer_status_bf,snakemake@output[["primer_status_bf"]])
 primer_status_af=NULL
 	
 for (i in 1:length(fnFs.cut)) {
-  temp<-rbind(FWD.ForwardReads = sapply(FWD.orients, primerHits, fn = fnFs.cut[[i]]), 
-              FWD.ReverseReads = sapply(FWD.orients, primerHits, fn = fnRs.cut[[i]])
+  FWD_ForwardReads = sapply(FWD.orients, primerHits, fn = fnFs.cut[[i]])
   sample <- gsub(x = basename(fnFs.cut[i]),pattern = paste0(fwd_pattern),replacement = "") 
-  row=cbind(sample,temp)
+  row=cbind(sample,FWD_ForwardReads)
   primer_status_af<-rbind(primer_status_af,row)
 }
 
