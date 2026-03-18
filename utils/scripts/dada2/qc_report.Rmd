@@ -412,21 +412,21 @@ This plot provides a step-by-step overview of the changes in read counts through
 ```{r table merge,echo=F,messages=FALSE, warning=FALSE,include=T,fig.width=11,fig.height=7}
 reads1<-reads
 
-colnames(reads1)[1:7]<-c("Sample", "Raw", "not-Quality_Trimmed", "not-Filtered", "Denoised", "Merged","Cleaned")
+colnames(reads1)[1:6]<-c("Sample", "Raw", "not-Quality_Trimmed", "not-Filtered", "Denoised", "Cleaned")
 
 reads1 <- reads1 %>%
   filter(!grepl("Undetermined", Sample))
 
 reads1 <- reads1 %>% mutate_all(~ifelse(is.na(.), 0, .))
 
-read_loss<-data.frame(step=names(colSums(reads1[,-c(1, 8)])),count=colSums(reads1[,-c(1, 8)]))
+read_loss<-data.frame(step=names(colSums(reads1[,-c(1, 7)])),count=colSums(reads1[,-c(1, 7)]))
 
-read_loss$step<- c("Raw", "Quality_Trimmed", "Filtered", "not-Denoised", "not-Merged","Chimeric")
+read_loss$step<- c("Raw", "Quality_Trimmed", "Filtered", "not-Denoised","Chimeric")
 
 # Create a color palette for the bars (you can customize these colors)
 colors <- c("Raw" = "#f5f0e1", "Quality_Trimmed" = "#ff6e40",
             "Filtered" = "#ff6e40", "not-Denoised" = "#ff6e40",
-            "not-Merged" = "#ff6e40","Chimeric" = "#ff6e40")
+            "Chimeric" = "#ff6e40")
 
 
 
@@ -434,7 +434,7 @@ colors <- c("Raw" = "#f5f0e1", "Quality_Trimmed" = "#ff6e40",
 new_data <- data.frame(
   step = read_loss$step,
   loss = c(read_loss$count[1],
-           diff(read_loss$count)[1:5])) %>%
+           diff(read_loss$count)[1:4])) %>%
 mutate(label = paste(step, "\n(n=", loss, ")"))
 
 waterfall(new_data, calc_total = TRUE,
@@ -465,9 +465,9 @@ htmltools::HTML("<br>")
 htmltools::HTML("<br>")
 
 
-reads1[,8]<-data.frame(reads1$Cleaned/reads1$Raw)*100
-colnames(reads1)[8]<-"Clean_Reads_Percent"
-reads1[,8]<-round(reads1[,8],digits = 2)
+reads1[,7]<-data.frame(reads1$Cleaned/reads1$Raw)*100
+colnames(reads1)[7]<-"Clean_Reads_Percent"
+reads1[,7]<-round(reads1[,7],digits = 2)
 
 
 
